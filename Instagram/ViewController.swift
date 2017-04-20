@@ -18,7 +18,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
   var trayDown: CGPoint!
   var trayUp: CGPoint!
   var trayDownOffset: CGFloat!
-  //let translation = CGPoint(x: 0.0, y: -145.0)
+  var smileyFaceOriginalCenter: CGPoint!
 
   var newlyCreatedFace: UIImageView!
   var newlyCreatedFaceCenter: CGPoint!
@@ -112,18 +112,31 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   func didPan(sender: UIPanGestureRecognizer) {
-    let location = sender.location(in: view)
+    let point = sender.location(in: view)
     let translation = sender.translation(in: view)
     let imageView = sender.view as! UIImageView
     imageView.transform = CGAffineTransform(translationX: translation.x, y: translation.y)
     //    sender.translation = 0
 
     if sender.state == .began {
-      print("didPan Gesture began at: \(location)")
+      print("Gesture began at: \(point)")
+      let imageView = sender.view as! UIImageView
+      smileyFaceOriginalCenter = imageView.center
+      print("didPan Gesture began at: \(smileyFaceOriginalCenter)")
     } else if sender.state == .changed {
-
     } else if sender.state == .ended {
+      print("Gesture ended at: \(point)")
+      print("Tray View y: \(self.trayView.frame.origin.y)")
 
+      let imageView = sender.view as! UIImageView
+
+      if imageView.frame.origin.y > self.trayView.frame.origin.y {
+        print("Smiley y: \(imageView.frame.origin.y)")
+        UIView.animate(withDuration: 0.7) {
+          imageView.center = self.smileyFaceOriginalCenter
+        }
+      }
+      //print("Smiley began at: \(smileyFaceOriginalCenter)")
     }
   }
 
