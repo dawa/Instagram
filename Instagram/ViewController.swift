@@ -12,6 +12,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
   @IBOutlet weak var trayView: UIView!
 
+  @IBOutlet weak var arrowView: UIImageView!
+
   var trayOriginalCenter: CGPoint!
   var trayDown: CGPoint!
   var trayUp: CGPoint!
@@ -52,7 +54,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
       if velocity.y > 0 {
           // Panning up
           UIView.animate(withDuration: 0.3) {
-             self.trayView.center = self.trayUp
+            self.trayView.center = self.trayUp
+            self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(0 * Double.pi / 180))
           }
       }
       else {
@@ -64,6 +67,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         UIView.animate(withDuration:0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options:[] ,
                        animations: { () -> Void in
                         self.trayView.center = self.trayDown
+                        self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(180 * Double.pi / 180))
         }, completion: nil)
       }
     } else if sender.state == .ended {
