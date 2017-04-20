@@ -12,22 +12,22 @@ class ViewController: UIViewController {
 
   @IBOutlet weak var trayView: UIView!
 
-  @IBOutlet var panGestureRecognizer: UIPanGestureRecognizer!
-
   var trayOriginalCenter: CGPoint!
-  var trayCenterWhenOpen: CGPoint!
-  var trayCenterWhenClosed: CGPoint!
-  let translation = CGPoint(x: 0.0, y: -100.0)
+  var trayDown: CGPoint!
+  var trayUp: CGPoint!
+  var trayDownOffset: CGFloat!
+  //let translation = CGPoint(x: 0.0, y: -145.0)
 
   var newlyCreatedFace: UIImageView!
   var newlyCreatedFaceCenter: CGPoint!
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
+    trayDownOffset = 145
     trayOriginalCenter = trayView.center
-    trayCenterWhenClosed = trayView.center
-    trayCenterWhenOpen =  CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y + translation.y)
+    trayUp = trayOriginalCenter
+    trayDown =  CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y - trayDownOffset)
+    trayDownOffset = 145
     newlyCreatedFaceCenter = trayOriginalCenter
 
   }
@@ -39,39 +39,34 @@ class ViewController: UIViewController {
 
 
   @IBAction func onTrayPanGesture(_ sender: UIPanGestureRecognizer) {
-    let point = panGestureRecognizer.location(in: view)
+    let point = sender.location(in: view)
+    let translation = sender.translation(in: view)
+    print("translation \(translation)")
 
-
-    if panGestureRecognizer.state == .began {
+    if sender.state == .began {
       print("Gesture began at: \(point)")
-      trayView.center = point
-    } else if panGestureRecognizer.state == .changed {
+      trayOriginalCenter = trayView.center
+    } else if sender.state == .changed {
       print("Gesture changed at: \(point)")
-      let velocity = panGestureRecognizer.velocity(in: view)
+      let velocity = sender.velocity(in: view)
       if velocity.y > 0 {
-          // Moving up
-          UIView.animate(withDuration: 1.0, delay: 0.0, options: [], animations: {
-             self.trayView.center = CGPoint(x: self.trayCenterWhenOpen.x, y: self.trayCenterWhenOpen.y - self.translation.y)
-          }, completion: { (finished) in
-            print("animation completed!")
-          })
-
-//        // Animation with bounce effect
-//        UIView.animate(withDuration: 1, delay: 1, usingSpringWithDamping: 0.5, initialSpringVelocity: 5, options: [], animations: {
-//          self.trayView.center = CGPoint(x: self.trayCenterWhenOpen.x, y: self.trayCenterWhenOpen.y - self.translation.y)
-//        }, completion: { (finished) in
-//          print("animation completed!")
-//        })
+          // Panning up
+          UIView.animate(withDuration: 0.3) {
+             self.trayView.center = self.trayUp
+          }
       }
       else {
-         UIView.animate(withDuration: 1, delay: 0.0, options: [], animations: {
-          self.trayView.center = CGPoint(x: self.trayCenterWhenClosed.x, y: self.trayCenterWhenClosed.y + self.translation.y)
-         }, completion: { (finished) in
-          print("animation completed!")
-         })
-      }
+//        UIView.animate(withDuration: 0.3) {
+//          self.trayView.center = self.trayDown
+//        }
 
-    } else if panGestureRecognizer.state == .ended {
+        // Animation with bounce effect
+        UIView.animate(withDuration:0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options:[] ,
+                       animations: { () -> Void in
+                        self.trayView.center = self.trayDown
+        }, completion: nil)
+      }
+    } else if sender.state == .ended {
       print("Gesture ended at: \(point)")
     }
   }
@@ -98,6 +93,13 @@ class ViewController: UIViewController {
       // Since the original face is in the tray, but the new face is in the
       // main view, you have to offset the coordinates
       newlyCreatedFace.center.y += trayView.frame.origin.y
+
+      // Here we use the method didPan(sender:), which we defined in the previous step, as the action.
+      let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(sender:)))
+
+      // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
+      newlyCreatedFace.isUserInteractionEnabled = true
+      newlyCreatedFace.addGestureRecognizer(panGestureRecognizer)
     } else if sender.state == .changed {
       print("Gesture changed at: \(point)")
         self.newlyCreatedFace.center = point
@@ -106,5 +108,18 @@ class ViewController: UIViewController {
     }
   }
 
+  func didPan(sender: UIPanGestureRecognizer) {
+//    let location = sender.location(in: view)
+//    let velocity = sender.velocity(in: view)
+//    let translation = sender.translation(in: view)
+
+    if sender.state == .began {
+
+    } else if sender.state == .changed {
+
+    } else if sender.state == .ended {
+
+    }
+  }
 }
 
