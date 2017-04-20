@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
   @IBOutlet weak var trayView: UIView!
 
@@ -39,15 +39,15 @@ class ViewController: UIViewController {
 
 
   @IBAction func onTrayPanGesture(_ sender: UIPanGestureRecognizer) {
-    let point = sender.location(in: view)
-    let translation = sender.translation(in: view)
-    print("translation \(translation)")
+    //let point = sender.location(in: view)
+    //let translation = sender.translation(in: view)
+    //print("translation \(translation)")
 
     if sender.state == .began {
-      print("Gesture began at: \(point)")
+      //print("Gesture began at: \(point)")
       trayOriginalCenter = trayView.center
     } else if sender.state == .changed {
-      print("Gesture changed at: \(point)")
+      //print("Gesture changed at: \(point)")
       let velocity = sender.velocity(in: view)
       if velocity.y > 0 {
           // Panning up
@@ -67,17 +67,14 @@ class ViewController: UIViewController {
         }, completion: nil)
       }
     } else if sender.state == .ended {
-      print("Gesture ended at: \(point)")
+      //print("Gesture ended at: \(point)")
     }
   }
 
   @IBAction func onTapFaceGestureRecognizer(_ sender: UIPanGestureRecognizer) {
-
     let point = sender.location(in: view)
 
     if sender.state == .began {
-      print("Gesture began at: \(point)")
-
       // Gesture recognizers know the view they are attached to
       let imageView = sender.view as! UIImageView
 
@@ -96,30 +93,46 @@ class ViewController: UIViewController {
 
       // Here we use the method didPan(sender:), which we defined in the previous step, as the action.
       let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(sender:)))
+      let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(didPinch(sender:)))
 
       // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
       newlyCreatedFace.isUserInteractionEnabled = true
       newlyCreatedFace.addGestureRecognizer(panGestureRecognizer)
+      newlyCreatedFace.addGestureRecognizer(pinchGestureRecognizer)
+
+      pinchGestureRecognizer.delegate = self;
     } else if sender.state == .changed {
-      print("Gesture changed at: \(point)")
         self.newlyCreatedFace.center = point
     } else if sender.state == .ended {
-      print("Gesture ended at: \(point)")
     }
   }
 
   func didPan(sender: UIPanGestureRecognizer) {
-//    let location = sender.location(in: view)
-//    let velocity = sender.velocity(in: view)
-//    let translation = sender.translation(in: view)
+    let location = sender.location(in: view)
+    let translation = sender.translation(in: view)
+    let imageView = sender.view as! UIImageView
+    imageView.transform = CGAffineTransform(translationX: translation.x, y: translation.y)
+    //    sender.translation = 0
 
     if sender.state == .began {
-
+      print("didPan Gesture began at: \(location)")
     } else if sender.state == .changed {
 
     } else if sender.state == .ended {
 
     }
+  }
+
+  func didPinch(sender: UIPinchGestureRecognizer) {
+    // get the scale value from the pinch gesture recognizer
+    let scale = sender.scale
+    let imageView = sender.view as! UIImageView
+    imageView.transform = imageView.transform.scaledBy(x: scale, y: scale)
+    sender.scale = 1
+  }
+
+  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    return true
   }
 }
 
