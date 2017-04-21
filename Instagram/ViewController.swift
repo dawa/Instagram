@@ -31,7 +31,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     trayDown =  CGPoint(x: trayOriginalCenter.x, y: trayOriginalCenter.y - trayDownOffset)
     trayDownOffset = 145
     newlyCreatedFaceCenter = trayOriginalCenter
-
+    self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(180 * Double.pi / 180))
   }
 
   override func didReceiveMemoryWarning() {
@@ -55,7 +55,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
           // Panning up
           UIView.animate(withDuration: 0.3) {
             self.trayView.center = self.trayUp
-            self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(0 * Double.pi / 180))
+            self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(180 * Double.pi / 180))
           }
       }
       else {
@@ -67,7 +67,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         UIView.animate(withDuration:0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options:[] ,
                        animations: { () -> Void in
                         self.trayView.center = self.trayDown
-                        self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(180 * Double.pi / 180))
+                        self.arrowView.transform = CGAffineTransform(rotationAngle: CGFloat(0 * Double.pi / 180))
         }, completion: nil)
       }
     } else if sender.state == .ended {
@@ -112,31 +112,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   func didPan(sender: UIPanGestureRecognizer) {
-    let point = sender.location(in: view)
-    let translation = sender.translation(in: view)
     let imageView = sender.view as! UIImageView
-    imageView.transform = CGAffineTransform(translationX: translation.x, y: translation.y)
-    //    sender.translation = 0
 
     if sender.state == .began {
-      print("Gesture began at: \(point)")
-      let imageView = sender.view as! UIImageView
       smileyFaceOriginalCenter = imageView.center
-      print("didPan Gesture began at: \(smileyFaceOriginalCenter)")
     } else if sender.state == .changed {
+      let translation = sender.translation(in: view)
+      imageView.transform = CGAffineTransform(translationX: translation.x, y: translation.y)
     } else if sender.state == .ended {
-      print("Gesture ended at: \(point)")
-      print("Tray View y: \(self.trayView.frame.origin.y)")
-
-      let imageView = sender.view as! UIImageView
-
       if imageView.frame.origin.y > self.trayView.frame.origin.y {
-        print("Smiley y: \(imageView.frame.origin.y)")
         UIView.animate(withDuration: 0.7) {
           imageView.center = self.smileyFaceOriginalCenter
         }
       }
-      //print("Smiley began at: \(smileyFaceOriginalCenter)")
     }
   }
 
